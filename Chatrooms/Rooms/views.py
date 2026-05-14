@@ -59,7 +59,9 @@ def registerPage(request):
 
 # --- 1. HOME & SEARCH ---
 def home(request):
+    
     user = request.user
+
     q = request.GET.get('q') if request.GET.get('q') is not None else ''
 
     # Filter rooms by topic name, room name, or description (Case-Insensitive)
