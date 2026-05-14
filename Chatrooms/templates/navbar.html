@@ -1,26 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    
-</head>
-<body>
-
-    <h1><a href="/">Home</a></h1>
-    <a href="{% url 'loginUser' %}">Login</a>
-    <hr>
-
-    <!-- {% if messages %}
-        <ul class="Messages">
-            {% for message in messages %}
-                <li>
-                    {{message}}
-                </li>
-                {% endfor %}
-        </ul>
-    {% endif %} -->
-</body>
-</html>
-
+{% load static %}
+<nav>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; margin: 0 auto;">
+        <h1><a href="/">DevChat</a></h1>
+    {%if user.is_authenticated%}
+         <div class="nav-links">
+            <a href="#" class="btn btn-primary">Profile</a>
+            <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+    {%else%}
+        <div class="nav-links">
+            <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+            <a href="{% url 'register' %}" class="btn btn-primary">Register</a>
+        </div>
+    {%endif%}
+    </div>
+</nav>

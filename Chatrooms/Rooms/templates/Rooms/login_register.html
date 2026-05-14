@@ -1,12 +1,46 @@
 {% include 'navbar.html' %}
 
-<div>
-    <form action="" method="post">
-        {% csrf_token %}
-        <label for="username">Username</label>
-        <input type="text" name="username" placeholder="Enter Username">
-        <label for="password">Password</label>
-        <input type="password" name="password" placeholder="Enter Password">
-        <input type="submit" value="Submit">
-    </form>
+<div class="form-wrapper">
+    <div class="auth-container" style="width: 100%; max-width: 450px;">
+        
+        <form action="" method="POST">
+            {% csrf_token %}
+            
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="color: var(--primary);">
+                    {% if page == 'login' %} Login to DevChat {% else %} Create an Account {% endif %}
+                </h2>
+                <p style="color: var(--text-muted);">Please enter your details below</p>
+            </div>
+
+            <div class="django-form-fields">
+                <p>
+                    <label>Username</label>
+                    <input type="text" name="username" placeholder="e.g. dennis_ivy" required>
+                </p>
+
+                <p>
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="••••••••" required>
+                </p>
+
+                {% if page == 'register' %}
+                <p>
+                    <label>Confirm Password</label>
+                    <input type="password" name="password_confirm" placeholder="••••••••" required>
+                </p>
+                {% endif %}
+            </div>
+
+            <input type="submit" value="{% if page == 'login' %}Login{% else %}Sign Up{% endif %}" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+            
+            <div style="text-align: center; margin-top: 20px; font-size: 0.9rem;">
+                {% if page == 'login' %}
+                    <p>Haven't joined yet? <a href="{% url 'register' %}" style="color: var(--primary); font-weight: bold;">Sign Up</a></p>
+                {% else %}
+                    <p>Already have an account? <a href="{% url 'login' %}" style="color: var(--primary); font-weight: bold;">Login</a></p>
+                {% endif %}
+            </div>
+        </form>
+    </div>
 </div>

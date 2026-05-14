@@ -1,9 +1,19 @@
 {% include 'navbar.html' %}
-
-<div>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+  
+<div class="form-wrapper">
     <form action="" method="post">
         {% csrf_token %}
-        {{form.as_p}}
-        <input type="submit" value="Submit">
+        <h2 style="margin-bottom: 20px; text-align: center;">Room Settings</h2>
+        
+        <div class="django-form-fields">
+            {{form.as_p}}
+        </div>
+        
+        <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <input type="submit" value="Save Room" class="btn btn-success" style="flex: 2;">
+            <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-danger" style="flex: 1; text-align: center;">Cancel</a>
+        </div>
     </form>
 </div>

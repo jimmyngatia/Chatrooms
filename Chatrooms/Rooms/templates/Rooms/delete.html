@@ -1,10 +1,18 @@
 {% include 'navbar.html' %}
-
-<div>
-    <form action="" method="post">
-        {%csrf_token%}
-        <p>Are You sure you want to delete {{object}}</p>
-        <a href="{{ request.META.HTTP_REFERER }}">Go Back</a>
-        <input type="submit" value="Comfirm">
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+  
+<div class="form-wrapper">
+    <form action="" method="post" style="text-align: center; border-top: 4px solid var(--danger);">
+        {% csrf_token %}
+        <h2 style="color: var(--danger);">Delete Confirmation</h2>
+        <p style="margin: 20px 0; font-size: 1.1rem;">
+            Are you sure you want to delete "<strong>{{object}}</strong>"? This action cannot be undone.
+        </p>
+        
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <input type="submit" value="Yes, Confirm Delete" class="btn btn-danger">
+            <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-primary">No, Go Back</a>
+        </div>
     </form>
 </div>

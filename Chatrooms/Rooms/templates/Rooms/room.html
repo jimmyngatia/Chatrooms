@@ -1,34 +1,103 @@
-
 {% include 'navbar.html' %}
-
-
-
-<div>
-    <div class="header">
-        <h1> {{room.name}} </h1>
-        <a href="{% url 'updateRoom' room.id %}">Edit Room</a>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+  
+<div class="mainContainer" style="grid-template-columns: 1fr;">
+    <div class="room-header" style="background: var(--bg-card); padding: 30px; border-radius: 15px; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>{{room.name}}</h1>
+            {% if request.user == room.host %}
+                <a href="{% url 'updateRoom' room.id %}" class="btn btn-primary">Edit Room Settings</a>
+            {% endif %}
+        </div>
+        <p style="color: var(--text-muted); margin-top: 10px;">Topic: {{room.topic}}</p>
     </div>
-    <div class="messages" ">
-        {% if messages %}
+
+    <div class="messages-section">
+        <div id="messages-container" class="messages-list">
             {% for message in messages %}
-                 <div style="border: solid;border-radius: 25px; width: fit-content;padding: 5px;background-color: rgb(7, 127, 127);">
-                     <small>@{{message.user}}</small>
-                     <br><br>
-                     <b>{{message.body}}</b>
-                     <br><br>
-                     <small>{{message.created}} >> updated on {{message.updated}}</small>
-                     <small><a href="{% url 'deleteMessage' message.id%}">delete</a></small>
-                 </div>
-                 <br>
-                 
-             {% endfor %}
-        {% else %}
-                 <div style="text-align: center;">
-                    <p>no messages here</p>
-                 </div>
-        {% endif %}
-
-        <a href="{% url 'createMessage' room.id %}"><button style="color: black;padding: 10px;background-color: green;border-radius: 10px;"><b>Send Message</b></button></a>
+                <div class="message-wrapper {% if message.user == request.user %}me{% endif %}">
+                    <div class="message-container">
+                        <small class="author">@{{message.user}}</small>
+                        <p>{{message.body}}</p>
+                        <small class="message-meta">{{message.created|timesince}} ago</small>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    
+        <div class="chat-input-area" style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
+            <form id="post-form" style="max-width: 100%; display: flex; gap: 10px; background: transparent; padding: 0; border: none;">
+                {% csrf_token %}
+                <input type="text" id="msg-body" placeholder="Write message..." required 
+                       style="flex: 1; margin: 0; background: var(--bg-input);">
+                <button type="submit" class="btn btn-primary">Send</button>
+            </form>
+        </div>
     </div>
-
+    
+    <script>
+        const postForm = document.getElementById('post-form');
+        const msgContainer = document.getElementById('messages-container');
+    
+        // 1. Helper function to scroll to bottom
+        function scrollToBottom() {
+            msgContainer.scrollTop = msgContainer.scrollHeight;
+        }
+    
+        // 2. Scroll to bottom as soon as the page finishes loading
+        window.onload = scrollToBottom;
+    
+        // 3. Handle AJAX Message Submission
+        postForm.addEventListener('submit', (e) => {
+            e.preventDefault(); // Stop page reload
+    
+            const bodyInput = document.getElementById('msg-body');
+            const bodyValue = bodyInput.value;
+            const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    
+            fetch("{% url 'createMessage' room.id %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrf,
+                },
+                body: new URLSearchParams({
+                    'body': bodyValue
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    // Construct the HTML for the new message (aligned to the right)
+                    const newMsg = `
+                        <div class="message-wrapper me">
+                            <div class="message-container" style="animation: slideUp 0.3s ease;">
+                                <p>${data.body}</p>
+                                <small class="message-meta">${data.created}</small>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Append message to the container
+                    msgContainer.insertAdjacentHTML('beforeend', newMsg);
+                    
+                    // Clear the input field
+                    postForm.reset();
+                    
+                    // Auto-scroll to show the new message
+                    scrollToBottom();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('There was an error sending your message. Please try again.');
+            });
+        });
+    </script>
 </div>

@@ -1,46 +1,59 @@
 {% include 'navbar.html' %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+  
+<main class="mainContainer">
 
-<style>
-    .mainContainer{
-        display: grid;
-        grid-template-columns: 1fr 3fr;
-    }
-</style>
-
-
-<div class="mainContainer">
-    <div class="Navigation">
+    <aside class="Navigation">
         <h3>Browse Topics</h3>
-        <hr>
-        <a href="{% url 'home' %}">All</a>
+        <hr style="margin: 15px 0; opacity: 0.2;">
+        <div class="specificTopic">
+            <a href="{% url 'home' %}">All Topics</a>
+        </div>
         {% for topic in topics %}
             <div class="specificTopic">
-            <a href="{% url 'home' %}?q={{topic.name}}">{{topic.name}}</a>
+                <a href="{% url 'home' %}?q={{topic.name}}">{{topic.name}}</a>
             </div>
         {% endfor %}
+    </aside>
 
-
-    </div>
-
-    <div class="chatrooms">
-        <div>
-            <a href="{% url 'createRoom' %}"><button style="background-color: green; width: 40px;height: 40px;border-radius: 40px;border: solid;text-align: center;font-size: large;"><b>+</b></button></a>Create Room
-            <br>
-            {% for room in rooms %}
-                <b>{{room.id}}</b>
-                <a href="{% url 'room' room.id %}">
-                    <div style="width:300px; border:solid;border-radius: 25px;text-decoration: none;padding: 5px;background-color: rgba(8, 145, 150, 0.8);">
-                        <span>@{{room.host}}</span>
-                        <h2 style="text-decoration: none;">{{room.name}}</h2>
-                        <small>{{room.topic}}</small>
-                        <br>
-                        <a href="{% url 'updateRoom' room.id %}"><button style="background-color: rgb(5, 168, 18);border-radius: 10px;padding: 10px;"><b>Edit Room</b></button></a>
-                        <a href="{% url 'deleteRoom' room.id %}"><button style="background-color: rgb(190, 6, 24);border-radius: 10px;padding: 10px;"><b>DElete Task</b></button></a>
-                        <br>
-                    </div>
-                
-            {% endfor %}
+    <section class="chatrooms">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Recent Rooms</h2>
+            <a href="{% url 'createRoom' %}" class="btn btn-success">+ Create Room</a>
         </div>
-    </div>
-</div>
-
+        <div style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+            <p style="color: var(--text-muted);">
+                Showing <strong>{{rooms.count}}</strong> active rooms
+            </p>
+        </div>
+        {% for room in rooms %}
+        <div class="room-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <small style="color: var(--primary);">@{{room.host}} • {{room.topic}}</small>
+                    <a href="{% url 'room' room.id %}">
+                        <h3 style="margin: 5px 0;">{{room.name}}</h3>
+                    </a>
+                    
+                    <div class="room-stats" style="display: flex; gap: 15px; margin-top: 10px;">
+                        <span style="font-size: 0.85rem; color: var(--text-muted);">
+                            <strong>{{room.participants.count}}</strong> Members
+                        </span>
+                        <span style="font-size: 0.85rem; color: var(--text-muted);">
+                            <strong>{{room.messages.count}}</strong> Messages
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    {% if request.user == room.host %}
+                        <a href="{% url 'updateRoom' room.id %}" class="btn btn-primary" style="padding: 5px 10px; font-size: 0.8rem;">Edit</a>
+                        <a href="{% url 'deleteRoom' room.id %}" class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8rem;">Delete</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </section>
+</main>
